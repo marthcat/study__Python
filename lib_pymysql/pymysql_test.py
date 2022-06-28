@@ -1,7 +1,5 @@
-import enum
-from debugpy import connect
+from enum import Enum
 import pymysql
-from requests import delete
 
 class Pymysql_test() :
   #변수 설정 global 
@@ -32,12 +30,13 @@ class Pymysql_test() :
                       db= self.db,
                       charset= self.charset)
 
-  def Disconnect(self):
+  def Close(self):
+    self.cur.close()
     self.conn.close()
 
   def Execute(self, query):
-    self.cur = self.conn.cursor()   
-    
+    self.cur = self.conn.cursor()     
+     
     return self.cur.execute(query)
 
   def FetchAll(self):
@@ -57,7 +56,7 @@ class Pymysql_test() :
 ## pip
 ## pip install cryptography
 
-class testWorkEnum(enum):
+class TestWorkEnum(Enum) :
   CreateDB = 1
   CreateTable = 2
   InsertData = 3
@@ -65,34 +64,74 @@ class testWorkEnum(enum):
   DeleteTable = 5
   DeleteDB = 6
 
-test = [testWorkEnum.CreateDB, testWorkEnum.CreateTable, testWorkEnum.InsertData, testWorkEnum.Select, testWorkEnum.DeleteTable, testWorkEnum.DeleteDB]
+test = [TestWorkEnum.CreateDB, TestWorkEnum.CreateTable, TestWorkEnum.InsertData, TestWorkEnum.Select, TestWorkEnum.DeleteTable, TestWorkEnum.DeleteDB]
+# test = [TestWorkEnum.Select]
 
 if __name__ == "__main__":
   sql = Pymysql_test(user='root', password='1234', host='127.0.0.1')
-  if testWorkEnum.CreateDB in test :
+
+  if TestWorkEnum.CreateDB in test :
     sql.Connect()    
     sql.Execute("CREATE DATABASE IF NOT EXISTS testpymysql")
-    sql.commit()
-  if testWorkEnum.CreateTable in test :   
-    pass
-  if testWorkEnum.InsertData in test :   
-    pass
-  if testWorkEnum.Select in test :
+    sql.Commit()
+    print("--CreateDB--")
+
+  if TestWorkEnum.CreateTable in test :   
+    sql.SetConnectionInfo(db="testpymysql", charset='utf8')
+    sql.Connect()    
+    query = '''CREATE TABLE IF NOT EXISTS tblGood (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(20) NOT NULL,                          
+                text VARCHAR(20) NULL
+               )
+            '''
+    sql.Execute(query)
+    sql.Commit()
+    print("--CreateTable--")
+    
+  if TestWorkEnum.InsertData in test :   
+    sql.SetConnectionInfo(db="testpymysql") 
+    sql.Connect()
+    sql.Execute("INSERT INTO tblGood(name, text) VALUE('AAA','111')")
+    sql.Execute("INSERT INTO tblGood(name, text) VALUE('BBB','222')")
+    sql.Execute("INSERT INTO tblGood(name, text) VALUE('CCC','333')")
+    sql.Commit()
+    print("--InsertData--")
+
+  if TestWorkEnum.Select in test :
     # sql.SetConnectionInfo(db="employees") 
     # sql.Connect()
     # qlen = sql.Execute("select * from titles")
     # print("-test-1: {}".format(qlen))  
     # for f in sql.FetchAll():
     #   print(f)    
-    sql.SetConnectionInfo(db="sakila") 
+    # sql.SetConnectionInfo(db="sakila") 
+    # sql.Connect()
+    # qlen = sql.Execute("select * from actor")
+    # print("-test-2: {}".format(qlen))
+    # for f in range(qlen):
+    #   print(sql.FetchOne())
+    sql.SetConnectionInfo(db="testpymysql") 
     sql.Connect()
-    qlen = sql.Execute("select * from actor")
-    print("-test-2: {}".format(qlen))
+    qlen = sql.Execute("select * from tblGood")
+    print(type(sql))
     for f in range(qlen):
       print(sql.FetchOne())
-  if testWorkEnum.DeleteTable in test :
-    pass
-  if testWorkEnum.DeleteDB in test :
-    pass
+    print("--Select--")
+
+  if TestWorkEnum.DeleteTable in test :
+    sql.SetConnectionInfo(db="testpymysql") 
+    sql.Connect()    
+    sql.Execute("DROP Table IF EXISTS tblGood")
+    sql.Commit()
+    print("--DeleteTable--")
+
+  if TestWorkEnum.DeleteDB in test :
+    sql.Connect()    
+    sql.Execute("DROP DATABASE testpymysql")
+    sql.Commit()
+    print("--DeleteDB--")
+
+  sql.Close()
   
 
