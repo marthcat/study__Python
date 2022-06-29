@@ -1,7 +1,7 @@
 from enum import Enum
 import pymysql
 
-class Pymysql_test() :
+class Pymysql_worker() :
   #변수 설정 global 
   conn= None 
   cur = None
@@ -68,7 +68,7 @@ test = [TestWorkEnum.CreateDB, TestWorkEnum.CreateTable, TestWorkEnum.InsertData
 # test = [TestWorkEnum.Select]
 
 if __name__ == "__main__":
-  sql = Pymysql_test(user='root', password='1234', host='127.0.0.1')
+  sql = Pymysql_worker(user='root', password='1234', host='127.0.0.1')
 
   if TestWorkEnum.CreateDB in test :
     sql.Connect()    
