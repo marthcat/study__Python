@@ -14,21 +14,21 @@ class Food:
         self.name = name
         self.price = price
         
-class PizzaStore@@@:
+class PizzaStore(DeliveryStore):
     def __init__(self):
         menu_names = ["Cheese", "Potato", "Shrimp", "Pineapple", "Meatball"]
-        menu_prices = [11100, 12600, 13300, 21000, 19500];
+        menu_prices = [11100, 12600, 13300, 21000, 19500]
         self.menu_list = []
         for i in range(5):
             self.menu_list.append(Food(menu_names[i], menu_prices[i]))
         
         self.order_list = []
     
-    def @@@:
+    def set_order_list(self, order_list):
         for order in order_list:
             self.order_list.append(order)
 
-    def @@@:
+    def get_total_price(self):
         total_price = 0
         for order in self.order_list:
             for menu in self.menu_list:
